@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: #060810;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Brand Studio | Authentication</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="shortcut icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="theme-color" content="#10b981">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: transparent; color: #e2e8f0; }
+        .font-gaming { font-family: 'Orbitron', sans-serif; }
+        .bg-glass { background: rgba(15, 23, 42, 0.88); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(14px); }
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+        .btn-3d { transition: all 0.2s ease; box-shadow: 0 6px 20px rgba(16, 185, 129, 0.25); -webkit-tap-highlight-color: transparent; }
+        .btn-3d:active { transform: scale(0.98); box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2); }
+        @media (hover: hover) and (pointer: fine) {
+            .btn-3d:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen relative overflow-hidden p-3.5 sm:p-4">
+    <!-- 3D Background Container -->
+    <div id="vanta-bg" class="fixed inset-0 pointer-events-none" style="z-index: -20;"></div>
+
+    <div class="bg-glass p-6 sm:p-10 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-700/80 max-w-md w-full z-10 relative overflow-hidden backdrop-blur-xl">
+        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-500"></div>
+        
+        <div class="text-center mb-6 sm:mb-7">
+            <a href="index (4).html" class="inline-block mb-2 sm:mb-3 hover:opacity-80 transition">
+                <h1 class="font-gaming text-xl sm:text-2xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-500">
+                    BRAND<span class="text-white">STUDIO</span>
+                </h1>
+            </a>
+            <p class="text-slate-400 text-xs sm:text-sm" id="auth-subtitle">Sign in to access tickets and orders</p>
+        </div>
+
+        <!-- 1. LOGIN FORM -->
+        <div id="login-form" class="form-section active">
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">EMAIL ADDRESS</label>
+                    <input type="email" id="login-email" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 transition text-base sm:text-sm" placeholder="gamer@example.com">
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-bold text-slate-400">PASSWORD</label>
+                        <button type="button" onclick="switchView('recover')" class="text-xs text-emerald-400 hover:text-emerald-300 font-bold">Forgot Password?</button>
+                    </div>
+                    <input type="password" id="login-pass" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-emerald-500 transition text-base sm:text-sm" placeholder="••••••••">
+                </div>
+                <button type="submit" id="btn-login" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-3 rounded-xl transition btn-3d mt-2 text-sm">
+                    LOG IN
+                </button>
+            </form>
+            <p class="text-center text-slate-400 text-xs sm:text-sm mt-5 sm:mt-6">
+                Don't have an account? <button onclick="switchView('register')" class="text-emerald-400 font-bold hover:underline">Register here</button>
+            </p>
+        </div>
+
+        <!-- 2. REGISTER FORM -->
+        <div id="register-form" class="form-section">
+            <form onsubmit="handleRegister(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">EMAIL ADDRESS</label>
+                    <input type="email" id="reg-email" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-500 transition text-base sm:text-sm" placeholder="gamer@example.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">CHOOSE PASSWORD</label>
+                    <input type="password" id="reg-pass" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-500 transition text-base sm:text-sm" placeholder="Choose a secure password">
+                </div>
+                <button type="submit" id="btn-register" class="w-full bg-gradient-to-r from-emerald-400 to-cyan-400 hover:from-emerald-500 hover:to-cyan-500 text-slate-950 font-black py-3 rounded-xl transition btn-3d mt-2 text-sm">
+                    CREATE ACCOUNT
+                </button>
+            </form>
+            <p class="text-center text-slate-400 text-xs sm:text-sm mt-5 sm:mt-6">
+                Already registered? <button onclick="switchView('login')" class="text-cyan-400 font-bold hover:underline">Log in</button>
+            </p>
+        </div>
+
+        <!-- 3. SUCCESS / ONE-TIME RECOVERY CODE DISPLAY -->
+        <div id="success-code-form" class="form-section text-center">
+            <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                <i class="fa-solid fa-key"></i>
+            </div>
+            <h2 class="text-xl font-bold text-white mb-2">Account Created!</h2>
+            <p class="text-xs text-slate-400 mb-5">
+                Save this one-time <strong>Recovery Code</strong> now! If you ever forget your password, you will need this code to reset it. It will <span class="text-red-400 font-bold">never be shown again</span>.
+            </p>
+            
+            <div class="bg-slate-950/80 border border-slate-700 p-4 rounded-xl mb-4 relative">
+                <p class="text-[10px] text-slate-500 font-bold tracking-wider uppercase mb-1">YOUR SECRET RECOVERY CODE</p>
+                <p id="display-code" class="text-xl sm:text-2xl font-gaming tracking-[0.2em] sm:tracking-[0.25em] text-emerald-400 font-black select-all">ABC123XYZ0</p>
+            </div>
+
+            <button onclick="copyCode()" class="text-xs text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 py-2 px-4 rounded-lg font-bold mb-5 transition inline-flex items-center gap-1.5 active:scale-95">
+                <i class="fa-solid fa-copy"></i> Copy to Clipboard
+            </button>
+
+            <button onclick="switchView('login')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-3 rounded-xl transition btn-3d text-sm">
+                I Saved My Code, Continue to Login
+            </button>
+        </div>
+
+        <!-- 4. RECOVER PASSWORD FORM -->
+        <div id="recover-form" class="form-section">
+            <p class="text-xs text-slate-400 mb-4 text-center">Enter your registered email and the 10-character recovery code you saved when creating your account.</p>
+            <form onsubmit="handleRecover(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">EMAIL ADDRESS</label>
+                    <input type="email" id="rec-email" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-purple-500 transition text-base sm:text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">RECOVERY CODE</label>
+                    <input type="text" id="rec-code" required class="w-full font-gaming tracking-widest uppercase bg-slate-900 border border-slate-700 rounded-xl p-3 text-emerald-400 focus:outline-none focus:border-purple-500 transition text-base sm:text-sm" placeholder="XXXXXXXXXX">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">NEW PASSWORD</label>
+                    <input type="password" id="rec-pass" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-white focus:outline-none focus:border-purple-500 transition text-base sm:text-sm" placeholder="Enter new password">
+                </div>
+                <button type="submit" id="btn-recover" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-black py-3 rounded-xl transition btn-3d mt-2 text-sm shadow-[0_0_20px_rgba(168,85,247,0.3)]">
+                    RESET PASSWORD
+                </button>
+            </form>
+            <p class="text-center text-slate-400 text-xs sm:text-sm mt-5 sm:mt-6">
+                <button onclick="switchView('login')" class="text-purple-400 font-bold hover:underline">Back to Login</button>
+            </p>
+        </div>
+    </div>
+
+    <!-- 3D Background Engine -->
+    <script src="bg-3d.js"></script>
+
+    <!-- Auth Logic -->
+    <script>
+        function switchView(view) {
+            document.querySelectorAll('.form-section').forEach(el => el.classList.remove('active'));
+            const target = document.getElementById(view + '-form');
+            if (target) target.classList.add('active');
+            
+            const subs = {
+                'login': 'Sign in to access tickets and orders',
+                'register': 'Create a new account',
+                'recover': 'Reset your password with your recovery code',
+                'success-code': 'Save your secret recovery code'
+            };
+            document.getElementById('auth-subtitle').innerText = subs[view] || '';
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-pass').value.trim();
+            const btn = document.getElementById('btn-login');
+            btn.disabled = true;
+            btn.innerText = 'Logging in...';
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.setItem('brandUser', data.email || email);
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirect = urlParams.get('redirect');
+                    window.location.href = redirect ? redirect : 'index (4).html';
+                } else {
+                    alert(data.message || 'Invalid credentials');
+                }
+            } catch (err) {
+                alert('Connection error. Please ensure server is running.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'LOG IN';
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-pass').value.trim();
+            const btn = document.getElementById('btn-register');
+            btn.disabled = true;
+            btn.innerText = 'Creating account...';
+
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('display-code').innerText = data.recovery_code;
+                    switchView('success-code');
+                } else {
+                    alert(data.message || 'Registration failed');
+                }
+            } catch (err) {
+                alert('Connection error. Please ensure server is running.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'CREATE ACCOUNT';
+            }
+        }
+
+        async function handleRecover(e) {
+            e.preventDefault();
+            const email = document.getElementById('rec-email').value.trim();
+            const code = document.getElementById('rec-code').value.trim().toUpperCase();
+            const new_pass = document.getElementById('rec-pass').value.trim();
+            const btn = document.getElementById('btn-recover');
+            btn.disabled = true;
+            btn.innerText = 'Resetting...';
+
+            try {
+                const res = await fetch('/api/recover', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, recovery_code: code, new_password: new_pass })
+                });
+                const data = await res.json();
+                alert(data.message);
+                if (data.success) switchView('login');
+            } catch (err) {
+                alert('Connection error. Please ensure server is running.');
+            } finally {
+                btn.disabled = false;
+                btn.innerText = 'RESET PASSWORD';
+            }
+        }
+
+        function copyCode() {
+            const code = document.getElementById('display-code').innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Recovery code copied to clipboard!');
+            });
+        }
+    </script>
+</body>
+</html>

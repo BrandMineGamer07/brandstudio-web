@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: #060810;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Brand Studio | My Tickets</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="shortcut icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+
+    <!-- Open Graph (Discord, WhatsApp Embed) -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Brand Studio">
+    <meta property="og:title" content="Brand Studio | Customer Ticket Dashboard">
+    <meta property="og:description" content="View your orders and chat directly with Brand Studio support.">
+    <meta property="og:image" content="icon.png">
+    <meta name="theme-color" content="#10b981">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: transparent; color: #e2e8f0; }
+        .font-gaming { font-family: 'Orbitron', sans-serif; }
+        .bg-glass { background: rgba(15, 23, 42, 0.88); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(14px); }
+        .ticket-active { border-color: #10b981 !important; background: rgba(16, 185, 129, 0.12) !important; box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+        .pb-safe { padding-bottom: max(0.5rem, env(safe-area-inset-bottom)); }
+    </style>
+</head>
+<body class="flex flex-col h-[100dvh] overflow-hidden relative">
+    <!-- 3D Background Container -->
+    <div id="vanta-bg" class="fixed inset-0 pointer-events-none" style="z-index: -20;"></div>
+
+    <!-- NAVBAR -->
+    <nav class="w-full z-50 bg-glass border-b border-slate-800/80 shrink-0">
+        <div class="max-w-7xl mx-auto px-3.5 py-3 flex justify-between items-center">
+            <a href="index (4).html" class="flex items-center gap-2 text-slate-300 hover:text-emerald-400 transition shrink-0">
+                <i class="fa-solid fa-arrow-left text-sm"></i>
+                <span class="font-gaming text-lg sm:text-xl font-extrabold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-500">
+                    BRAND<span class="text-white">STUDIO</span>
+                </span>
+                <span class="text-[10px] sm:text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full ml-1 sm:ml-2 font-bold uppercase tracking-wider hidden xs:inline">Tickets</span>
+            </a>
+            <div class="flex items-center gap-2 sm:gap-3 text-sm">
+                <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-700/80 px-2.5 py-1.5 rounded-xl">
+                    <i class="fa-solid fa-user-circle text-emerald-400"></i>
+                    <span id="nav-user-text" class="text-slate-200 font-bold text-xs truncate max-w-[80px] sm:max-w-[140px]">User</span>
+                </div>
+                <button onclick="logout()" class="text-xs text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 px-2.5 py-1.5 rounded-lg border border-red-500/20 font-bold transition">
+                    <i class="fa-solid fa-arrow-right-from-bracket mr-1"></i> <span class="hidden xs:inline">Logout</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN DASHBOARD -->
+    <main class="flex-grow flex max-w-7xl mx-auto w-full p-2.5 sm:p-4 gap-3 sm:gap-4 z-10 relative overflow-hidden h-full pb-3 sm:pb-6">
+        
+        <!-- Ticket List (Left Pane) -->
+        <div id="ticket-list-pane" class="w-full md:w-1/3 bg-slate-900/90 border border-slate-800 rounded-2xl flex flex-col overflow-hidden backdrop-blur-md shadow-2xl">
+            <div class="p-4 border-b border-slate-800/80 bg-slate-950/60 flex justify-between items-center shrink-0">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-ticket text-emerald-400"></i>
+                    <h3 class="font-bold text-white text-sm uppercase tracking-wider">Your Orders</h3>
+                </div>
+                <span id="ticket-count" class="bg-emerald-500/20 text-emerald-400 text-xs px-2.5 py-0.5 rounded-full font-bold">0</span>
+            </div>
+            <div id="tickets-container" class="flex-grow overflow-y-auto p-3 space-y-2.5">
+                <p class="text-center text-slate-500 text-sm mt-8" id="empty-state">
+                    <i class="fa-solid fa-spinner fa-spin text-xl text-emerald-400 mb-2 block"></i> Loading your tickets...
+                </p>
+            </div>
+            <div class="p-3 border-t border-slate-800/80 bg-slate-950/40 shrink-0">
+                <a href="order.html" class="w-full bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 font-bold text-xs py-2.5 rounded-xl flex items-center justify-center gap-2 transition">
+                    <i class="fa-solid fa-plus"></i> Create New Ticket / Order
+                </a>
+            </div>
+        </div>
+
+        <!-- Chat View (Right Pane) -->
+        <div id="chat-pane" class="w-full md:w-2/3 bg-slate-900/90 border border-slate-800 rounded-2xl hidden md:flex flex-col overflow-hidden backdrop-blur-md shadow-2xl">
+            
+            <!-- EMPTY STATE (Visible when no ticket selected) -->
+            <div id="chat-empty-state" class="flex-grow flex flex-col items-center justify-center p-8 text-center">
+                <div class="w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-3xl mb-4 shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+                    <i class="fa-solid fa-comments"></i>
+                </div>
+                <h3 class="font-gaming text-lg font-bold text-white mb-2">No Ticket Selected</h3>
+                <p class="text-slate-400 text-sm max-w-sm">Select an order from the list on the left to view conversation history and chat directly with Brand Studio staff.</p>
+            </div>
+
+            <!-- ACTIVE CHAT VIEW (Hidden until ticket selected) -->
+            <div id="chat-active-content" class="flex-grow flex flex-col h-full hidden">
+                <!-- Chat Header -->
+                <div class="p-4 border-b border-slate-800/80 bg-slate-950/60 shrink-0 flex justify-between items-center">
+                    <div class="flex items-center gap-2.5">
+                        <button onclick="closeChatMobile()" aria-label="Back to ticket list" class="md:hidden w-8 h-8 rounded-lg bg-slate-800 text-slate-300 hover:text-white flex items-center justify-center text-sm shrink-0 active:scale-95"><i class="fa-solid fa-arrow-left"></i></button>
+                        <div class="overflow-hidden">
+                            <h3 class="font-bold text-white text-xs sm:text-base truncate max-w-[160px] sm:max-w-md" id="chat-header-title">Order #1</h3>
+                            <p class="text-[10px] sm:text-[11px] text-slate-400 truncate max-w-[180px] sm:max-w-md" id="chat-header-subtitle">Items</p>
+                        </div>
+                    </div>
+                    <span id="chat-header-status" class="px-2 py-0.5 sm:px-2.5 sm:py-1 text-[9px] sm:text-[10px] font-bold rounded-lg uppercase tracking-wider shrink-0">PENDING</span>
+                </div>
+
+                <!-- Chat Messages Scroll Area -->
+                <div id="chat-messages" class="flex-grow overflow-y-auto p-3 sm:p-6 space-y-3 sm:space-y-4">
+                    <!-- Messages will be rendered here -->
+                </div>
+
+                <!-- Chat Input Form -->
+                <div class="p-2.5 sm:p-3.5 border-t border-slate-800/80 bg-slate-950/60 shrink-0">
+                    <form onsubmit="handleSend(event)" class="flex items-center gap-2 sm:gap-3 bg-slate-900 border border-slate-700/80 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5 focus-within:border-emerald-500 transition">
+                        <input type="text" id="chat-input" placeholder="Type your message to staff..." class="flex-grow bg-transparent text-base sm:text-sm text-white focus:outline-none" autocomplete="off">
+                        <button type="submit" id="chat-send-btn" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold px-3.5 py-2 sm:px-4 sm:py-1.5 rounded-lg text-xs transition flex items-center gap-1.5 shrink-0 active:scale-95">
+                            <span>Send</span>
+                            <i class="fa-solid fa-paper-plane text-[10px]"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- 3D Background Engine -->
+    <script src="bg-3d.js"></script>
+
+    <!-- Application Script -->
+    <script>
+        const currentUser = localStorage.getItem('brandUser');
+        let currentTicketId = null;
+        let allTickets = [];
+
+        if (!currentUser) {
+            window.location.href = 'auth.html?redirect=user-tickets.html';
+        } else {
+            document.getElementById('nav-user-text').innerText = currentUser;
+            fetchTickets();
+            // Live auto-polling every 3 seconds for real-time messages
+            setInterval(fetchTicketsSilent, 3000);
+        }
+
+        function logout() {
+            if (confirm("Are you sure you want to log out?")) {
+                localStorage.removeItem('brandUser');
+                window.location.href = 'index (4).html';
+            }
+        }
+
+        async function fetchTickets() {
+            try {
+                const res = await fetch('/api/tickets?email=' + encodeURIComponent(currentUser));
+                allTickets = await res.json();
+                renderTickets();
+                if (currentTicketId) {
+                    const activeTicket = allTickets.find(t => t.id === currentTicketId);
+                    if (activeTicket) renderMessages(activeTicket.messages);
+                }
+            } catch (e) {
+                document.getElementById('empty-state').innerHTML = '<span class="text-red-400">Failed to connect to server. Please ensure server is running.</span>';
+            }
+        }
+
+        async function fetchTicketsSilent() {
+            try {
+                const res = await fetch('/api/tickets?email=' + encodeURIComponent(currentUser));
+                allTickets = await res.json();
+                if (currentTicketId) {
+                    const activeTicket = allTickets.find(t => t.id === currentTicketId);
+                    if (activeTicket) renderMessages(activeTicket.messages, false);
+                }
+            } catch (e) {}
+        }
+
+        function renderTickets() {
+            const container = document.getElementById('tickets-container');
+            document.getElementById('ticket-count').innerText = allTickets.length;
+
+            if (allTickets.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 px-4">
+                        <i class="fa-solid fa-folder-open text-3xl text-slate-600 mb-3 block"></i>
+                        <p class="text-slate-400 font-bold text-sm mb-1">No Orders Found</p>
+                        <p class="text-slate-500 text-xs">You haven't created any tickets or orders yet.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            allTickets.forEach(t => {
+                const isActive = t.id === currentTicketId;
+                const statusBadge = t.status === 'COMPLETED' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' :
+                                    t.status === 'CANCELLED' ? 'text-red-400 bg-red-500/10 border-red-500/30' :
+                                    'text-amber-400 bg-amber-500/10 border-amber-500/30';
+
+                const card = document.createElement('button');
+                card.onclick = () => selectTicket(t.id);
+                card.className = `w-full text-left p-3.5 rounded-xl border transition flex flex-col gap-2 ${
+                    isActive ? 'ticket-active' : 'bg-slate-800/80 hover:bg-slate-800 border-slate-700/60'
+                }`;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center w-full gap-2">
+                        <span class="font-bold text-white text-sm truncate flex items-center gap-2">
+                            <i class="fa-solid fa-receipt text-slate-400"></i>
+                            Order #${t.id}
+                        </span>
+                        <span class="text-[9px] font-bold px-2 py-0.5 rounded-full border ${statusBadge}">${t.status}</span>
+                    </div>
+                    <span class="text-xs text-slate-300 truncate w-full font-medium">${t.items || 'Order'}</span>
+                    <div class="flex justify-between items-center text-[10px] text-slate-500">
+                        <span><i class="fa-solid fa-clock mr-1"></i>${t.created_at || 'Recent'}</span>
+                        <span class="text-emerald-400 font-bold">${t.total_price || ''}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function selectTicket(id) {
+            currentTicketId = id;
+            const ticket = allTickets.find(t => t.id === id);
+            if (!ticket) return;
+
+            // Highlight in list
+            renderTickets();
+
+            // Mobile toggle: show chat pane, hide ticket list pane
+            if (window.innerWidth < 768) {
+                document.getElementById('ticket-list-pane').classList.add('hidden');
+                document.getElementById('chat-pane').classList.remove('hidden');
+                document.getElementById('chat-pane').classList.add('flex');
+            }
+
+            // Hide empty state, show active chat
+            document.getElementById('chat-empty-state').classList.add('hidden');
+            document.getElementById('chat-active-content').classList.remove('hidden');
+
+            // Set Header details
+            document.getElementById('chat-header-title').innerText = `Order #${ticket.id}: ${ticket.items}`;
+            document.getElementById('chat-header-subtitle').innerText = `Created: ${ticket.created_at || 'Recently'} • Total: ${ticket.total_price || '₹0'}`;
+
+            const statusEl = document.getElementById('chat-header-status');
+            statusEl.innerText = ticket.status;
+            statusEl.className = `px-2.5 py-1 text-[10px] font-bold rounded-lg uppercase tracking-wider ${
+                ticket.status === 'COMPLETED' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                ticket.status === 'CANCELLED' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+            }`;
+
+            renderMessages(ticket.messages || [], true);
+            document.getElementById('chat-input').focus();
+        }
+
+        function closeChatMobile() {
+            document.getElementById('chat-pane').classList.add('hidden');
+            document.getElementById('chat-pane').classList.remove('flex');
+            document.getElementById('ticket-list-pane').classList.remove('hidden');
+            currentTicketId = null;
+            renderTickets();
+        }
+
+        function renderMessages(msgs, autoScroll = true) {
+            const container = document.getElementById('chat-messages');
+            container.innerHTML = '';
+
+            if (!msgs || msgs.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 text-slate-500 text-xs">
+                        <i class="fa-solid fa-comment-dots text-2xl mb-2 text-slate-600 block"></i>
+                        No messages yet. Send a message below to talk to staff.
+                    </div>`;
+                return;
+            }
+
+            msgs.forEach(msg => {
+                const isMe = msg.sender === currentUser;
+                const isSystem = msg.sender === 'System';
+
+                if (isSystem) {
+                    container.innerHTML += `
+                        <div class="flex justify-center my-2">
+                            <span class="text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full shadow-sm">
+                                <i class="fa-solid fa-shield-halved mr-1.5"></i> ${msg.text}
+                            </span>
+                        </div>`;
+                } else if (isMe) {
+                    container.innerHTML += `
+                        <div class="flex items-end gap-2.5 justify-end">
+                            <div class="flex flex-col items-end max-w-[80%]">
+                                <span class="text-[10px] text-slate-500 mb-1">You • ${msg.time}</span>
+                                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 px-4 py-2.5 rounded-2xl rounded-br-none text-sm font-semibold shadow-md">
+                                    ${escapeHtml(msg.text)}
+                                </div>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0 shadow-md">
+                                <i class="fa-solid fa-user"></i>
+                            </div>
+                        </div>`;
+                } else {
+                    container.innerHTML += `
+                        <div class="flex items-end gap-2.5 justify-start">
+                            <div class="w-8 h-8 rounded-full bg-indigo-600 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-md">
+                                <i class="fa-solid fa-headset"></i>
+                            </div>
+                            <div class="flex flex-col items-start max-w-[80%]">
+                                <span class="text-[10px] text-indigo-400 font-bold mb-1">Staff • ${msg.time}</span>
+                                <div class="bg-slate-800 border border-slate-700/80 text-white px-4 py-2.5 rounded-2xl rounded-bl-none text-sm font-medium shadow-md">
+                                    ${escapeHtml(msg.text)}
+                                </div>
+                            </div>
+                        </div>`;
+                }
+            });
+
+            if (autoScroll) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        async function handleSend(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const text = input.value.trim();
+            if (!text || !currentTicketId) return;
+
+            input.value = '';
+
+            const ticket = allTickets.find(t => t.id === currentTicketId);
+            const dateStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            if (ticket) {
+                ticket.messages = ticket.messages || [];
+                ticket.messages.push({ sender: currentUser, text: text, time: dateStr });
+                renderMessages(ticket.messages, true);
+            }
+
+            try {
+                await fetch('/api/tickets/' + currentTicketId + '/message', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sender: currentUser, text: text })
+                });
+            } catch (err) {
+                console.error('Error sending message:', err);
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>

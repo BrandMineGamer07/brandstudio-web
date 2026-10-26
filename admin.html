@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en" style="background-color: #060810;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+    <title>Brand Studio | Admin Panel</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="shortcut icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="theme-color" content="#10b981">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: transparent; color: #e2e8f0; }
+        .font-gaming { font-family: 'Orbitron', sans-serif; }
+        .bg-glass { background: rgba(15, 23, 42, 0.88); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(14px); }
+        .tab-content { display: none; }
+        .tab-content.active { display: flex; }
+        .ticket-active { border-color: #10b981 !important; background: rgba(16, 185, 129, 0.12) !important; box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+        .pb-safe { padding-bottom: max(0.5rem, env(safe-area-inset-bottom)); }
+        
+        /* Smooth touch scrolling */
+        .touch-scroll {
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
+        }
+
+        /* Custom scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(16, 185, 129, 0.6); }
+    </style>
+</head>
+<body class="flex h-[100dvh] overflow-hidden relative selection:bg-emerald-500 selection:text-slate-950">
+    <!-- 3D Background Container -->
+    <div id="vanta-bg" class="fixed inset-0 pointer-events-none" style="z-index: -20;"></div>
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="w-64 bg-glass border-r border-slate-800 flex-col hidden md:flex z-20 shrink-0">
+        <div class="p-6 border-b border-slate-800">
+            <h1 class="font-gaming text-xl font-black text-emerald-400 tracking-wider">ADMIN PANEL</h1>
+            <p class="text-xs text-slate-500 mt-0.5">Brand Studio Management</p>
+        </div>
+        <nav class="flex-grow p-4 space-y-2">
+            <button onclick="switchTab('tickets')" class="w-full text-left px-4 py-3 rounded-xl bg-emerald-500/10 text-emerald-400 font-bold tab-btn transition flex items-center justify-between" id="btn-tickets">
+                <span class="flex items-center gap-3"><i class="fa-solid fa-ticket w-5 text-center"></i> Active Tickets</span>
+                <span id="sidebar-ticket-badge" class="hidden text-[10px] bg-emerald-500 text-slate-950 font-black px-2 py-0.5 rounded-full">0</span>
+            </button>
+            <button onclick="switchTab('history')" class="w-full text-left px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white font-bold transition tab-btn flex items-center gap-3" id="btn-history">
+                <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i> Order History
+            </button>
+            <button onclick="switchTab('pricing')" class="w-full text-left px-4 py-3 rounded-xl text-slate-400 hover:bg-slate-800 hover:text-white font-bold transition tab-btn flex items-center gap-3" id="btn-pricing">
+                <i class="fa-solid fa-tags w-5 text-center"></i> Edit Pricing
+            </button>
+        </nav>
+        <div class="p-4 border-t border-slate-800 space-y-3">
+            <div class="flex items-center gap-3">
+                <img src="nexusoyz.png" alt="nexusoyz" class="w-9 h-9 rounded-full border border-emerald-400 object-cover shadow-sm shrink-0">
+                <div class="overflow-hidden">
+                    <p class="text-xs font-bold text-white leading-tight">nexusoyz</p>
+                    <p class="text-[10px] text-emerald-400 font-semibold">Founder & Admin</p>
+                </div>
+            </div>
+            <a href="index (4).html" class="flex items-center gap-2 text-slate-400 hover:text-white text-xs font-bold transition">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Back to Main Site
+            </a>
+        </div>
+    </aside>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav id="mobile-bottom-nav" class="md:hidden fixed bottom-0 left-0 w-full bg-slate-950/95 border-t border-slate-800/90 z-30 flex justify-around p-2 pb-safe backdrop-blur-md transition-transform duration-200">
+        <button onclick="switchTab('tickets')" class="flex flex-col items-center p-2 text-emerald-400 tab-btn relative transition" id="btn-tickets-mob">
+            <i class="fa-solid fa-ticket text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Tickets</span>
+            <span id="mob-ticket-badge" class="hidden absolute top-1 right-2 bg-emerald-500 text-slate-950 text-[9px] font-black min-w-[16px] h-4 px-1 rounded-full flex items-center justify-center">0</span>
+        </button>
+        <button onclick="switchTab('history')" class="flex flex-col items-center p-2 text-slate-400 hover:text-white tab-btn transition" id="btn-history-mob">
+            <i class="fa-solid fa-clock-rotate-left text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">History</span>
+        </button>
+        <button onclick="switchTab('pricing')" class="flex flex-col items-center p-2 text-slate-400 hover:text-white tab-btn transition" id="btn-pricing-mob">
+            <i class="fa-solid fa-tags text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Pricing</span>
+        </button>
+        <a href="index (4).html" class="flex flex-col items-center p-2 text-slate-400 hover:text-white transition">
+            <i class="fa-solid fa-house text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Main Site</span>
+        </a>
+    </nav>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 flex flex-col min-h-0 h-full overflow-hidden relative z-10">
+        <!-- TOP HEADER -->
+        <header id="admin-top-header" class="bg-glass px-4 py-3 sm:px-6 sm:py-4 border-b border-slate-800 flex justify-between items-center shrink-0">
+            <h2 class="text-sm sm:text-lg font-bold text-white flex items-center gap-2" id="page-title">
+                <i class="fa-solid fa-sliders text-emerald-400"></i> Active Tickets
+            </h2>
+            <div class="flex items-center gap-2 sm:gap-3">
+                <img src="nexusoyz.png" alt="nexusoyz" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-emerald-400 object-cover shadow-sm shrink-0">
+                <span class="text-xs sm:text-sm font-bold text-emerald-400">Staff Mode</span>
+            </div>
+        </header>
+
+        <!-- TAB CONTENTS CONTAINER -->
+        <div class="flex-1 min-h-0 relative flex flex-col overflow-hidden">
+            
+            <!-- 1. TICKETS TAB -->
+            <div id="tickets" class="tab-content active h-full flex flex-col min-h-0 p-2 sm:p-4 md:p-6 pb-20 md:pb-6">
+                <div class="flex h-full gap-4 relative min-h-0">
+                    
+                    <!-- Left: Ticket List Pane -->
+                    <div id="admin-ticket-list-pane" class="w-full md:w-1/3 bg-slate-900/90 border border-slate-800 rounded-2xl flex flex-col overflow-hidden backdrop-blur-md shadow-2xl h-full min-h-0">
+                        <div class="p-3.5 sm:p-4 border-b border-slate-800/80 bg-slate-950/60 flex justify-between items-center shrink-0">
+                            <h3 class="font-bold text-white text-xs sm:text-sm uppercase tracking-wider flex items-center gap-2">
+                                <span>Customer Orders</span>
+                                <span id="open-ticket-count" class="text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full font-bold">0</span>
+                            </h3>
+                            <button onclick="fetchTickets()" class="text-xs text-slate-400 hover:text-emerald-400 font-bold transition flex items-center gap-1 active:scale-95">
+                                <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">Refresh</span>
+                            </button>
+                        </div>
+                        <div id="admin-ticket-list" class="flex-1 min-h-0 overflow-y-auto p-2.5 sm:p-3 space-y-2 touch-scroll">
+                            <p class="text-center text-slate-500 text-xs sm:text-sm mt-8">Loading tickets...</p>
+                        </div>
+                    </div>
+
+                    <!-- Right: Chat Pane (Fullscreen on mobile, 2/3 on desktop) -->
+                    <div id="admin-chat-pane" class="hidden md:flex fixed inset-0 z-40 bg-slate-950 md:relative md:inset-auto md:z-auto md:bg-slate-900/90 md:border md:border-slate-800 md:rounded-2xl md:w-2/3 flex-col overflow-hidden backdrop-blur-md shadow-2xl h-full min-h-0">
+                        
+                        <!-- Empty State (Desktop Only) -->
+                        <div id="admin-empty-state" class="flex-grow flex flex-col items-center justify-center p-8 text-center">
+                            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 text-2xl sm:text-3xl mb-4 shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+                                <i class="fa-solid fa-headset"></i>
+                            </div>
+                            <h3 class="font-gaming text-base sm:text-lg font-bold text-white mb-2">Select a Ticket</h3>
+                            <p class="text-slate-400 text-xs sm:text-sm max-w-sm">Click on any open order from the list on the left to review customer requirements, reply in real time, and update order status.</p>
+                        </div>
+
+                        <!-- Active Chat -->
+                        <div id="admin-active-content" class="flex-grow flex flex-col h-full min-h-0 hidden">
+                            <!-- Header -->
+                            <div class="p-3 sm:p-4 border-b border-slate-800/80 bg-slate-950/90 shrink-0 flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-2.5 min-w-0">
+                                    <button onclick="closeAdminChatMobile()" class="md:hidden w-8 h-8 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center text-sm shrink-0 active:scale-95" aria-label="Back to ticket list">
+                                        <i class="fa-solid fa-arrow-left"></i>
+                                    </button>
+                                    <div class="min-w-0">
+                                        <div class="flex items-center gap-2">
+                                            <h3 id="chat-header-user" class="font-bold text-white text-xs sm:text-sm truncate">Customer</h3>
+                                            <span id="chat-header-status" class="px-2 py-0.5 text-[9px] sm:text-[10px] font-bold rounded-md uppercase tracking-wider shrink-0">PENDING</span>
+                                        </div>
+                                        <p id="chat-header-details" class="text-[11px] text-slate-400 truncate">Order Details</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 shrink-0">
+                                    <button onclick="updateStatus('COMPLETED')" title="Mark as Completed" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-1.5 px-2.5 sm:px-3 rounded-lg text-xs transition flex items-center gap-1 active:scale-95 shadow-sm">
+                                        <i class="fa-solid fa-check"></i> <span class="hidden sm:inline">Complete</span>
+                                    </button>
+                                    <button onclick="updateStatus('CANCELLED')" title="Cancel Order" class="bg-slate-800 hover:bg-red-500/20 text-red-400 font-bold py-1.5 px-2.5 sm:px-3 rounded-lg text-xs transition border border-slate-700 flex items-center gap-1 active:scale-95">
+                                        <i class="fa-solid fa-xmark"></i> <span class="hidden sm:inline">Cancel</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Customer Requirements Alert (Scrollable & Responsive) -->
+                            <div id="chat-reqs-box" class="bg-slate-950/60 border-b border-slate-800/60 p-2.5 sm:p-3 text-xs text-slate-300 flex items-start gap-2 shrink-0 max-h-24 overflow-y-auto touch-scroll">
+                                <i class="fa-solid fa-circle-info text-emerald-400 mt-0.5 shrink-0"></i>
+                                <div class="min-w-0 flex-1"><strong class="text-white">Customer Requirements: </strong><span id="chat-reqs-text" class="break-words">None</span></div>
+                            </div>
+
+                            <!-- Messages Area -->
+                            <div id="chat-messages" class="flex-1 min-h-0 overflow-y-auto p-3 sm:p-6 space-y-3.5 touch-scroll">
+                                <!-- Messages injected here -->
+                            </div>
+
+                            <!-- Staff Reply Input -->
+                            <div class="p-2.5 sm:p-3.5 border-t border-slate-800/80 bg-slate-950/90 shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+                                <form onsubmit="handleStaffSend(event)" class="flex items-center gap-2 bg-slate-900 border border-slate-700/80 rounded-xl px-3 py-2 sm:py-2.5 focus-within:border-emerald-500 transition">
+                                    <input type="text" id="admin-chat-input" placeholder="Reply to customer as Staff..." class="flex-grow bg-transparent text-base sm:text-sm text-white focus:outline-none placeholder:text-slate-500" autocomplete="off">
+                                    <button type="submit" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-3.5 py-2 sm:px-4 sm:py-2 rounded-lg text-xs transition flex items-center gap-1.5 shrink-0 active:scale-95 shadow-md">
+                                        <span>Send</span>
+                                        <i class="fa-solid fa-paper-plane text-[10px]"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. HISTORY TAB -->
+            <div id="history" class="tab-content h-full overflow-y-auto p-3 sm:p-6 pb-24 md:pb-6 touch-scroll">
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-6 backdrop-blur-md max-w-5xl mx-auto w-full">
+                    <h3 class="text-base sm:text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-clock-rotate-left text-emerald-400"></i> Past Orders & Completed Tickets
+                    </h3>
+                    <div id="history-container" class="space-y-3">
+                        <p class="text-slate-500 text-sm">No completed orders yet.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. PRICING TAB -->
+            <div id="pricing" class="tab-content h-full overflow-y-auto p-3 sm:p-6 pb-28 md:pb-8 touch-scroll">
+                <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-6 backdrop-blur-md max-w-5xl mx-auto w-full">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 pb-4 border-b border-slate-800">
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-tags text-emerald-400"></i> Store & Service Pricing Manager
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-1">Edit live pricing for all services, digital accounts, and streaming subscriptions.</p>
+                        </div>
+                        <button onclick="savePricing()" id="btn-save-pricing" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2.5 px-6 rounded-xl transition flex items-center justify-center gap-2 text-sm shadow-lg active:scale-95">
+                            <i class="fa-solid fa-floppy-disk"></i> Save All Prices
+                        </button>
+                    </div>
+
+                    <div class="space-y-6 sm:space-y-8">
+                        <!-- Category 1: Services & Custom Dev -->
+                        <div>
+                            <h4 class="text-xs sm:text-sm font-bold text-emerald-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-hammer"></i> 1. Custom Development & Services (6 Items)
+                            </h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Minecraft Server Setup</label>
+                                    <input type="text" id="price-mc_server" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-emerald-500">
+                                </div>
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Server Configuration</label>
+                                    <input type="text" id="price-mc_config" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-emerald-500">
+                                </div>
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Discord Server Setup</label>
+                                    <input type="text" id="price-discord_server" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-emerald-500">
+                                </div>
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Roblox Game Development</label>
+                                    <input type="text" id="price-roblox_game" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-emerald-500">
+                                </div>
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Custom Website Development</label>
+                                    <input type="text" id="price-website" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-emerald-500">
+                                </div>
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">MC Resource Pack Maker</label>
+                                    <input type="text" id="price-mc_resource" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-emerald-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category 2: Gaming Store & Nitro -->
+                        <div>
+                            <h4 class="text-xs sm:text-sm font-bold text-cyan-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-gamepad"></i> 2. Digital Accounts & Discord Nitro (4 Items)
+                            </h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">1x Discord Nitro</label>
+                                    <input type="text" id="price-nitro_1" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">2x Discord Nitro</label>
+                                    <input type="text" id="price-nitro_2" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">1x MCFA Account</label>
+                                    <input type="text" id="price-mcfa_1" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-cyan-500">
+                                </div>
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">2x MCFA Account</label>
+                                    <input type="text" id="price-mcfa_2" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-cyan-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category 3: Streaming Services -->
+                        <div>
+                            <h4 class="text-xs sm:text-sm font-bold text-rose-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-play"></i> 3. Streaming & OTT Subscriptions (6 Items)
+                            </h4>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">YouTube Premium (1M)</label>
+                                    <input type="text" id="price-yt_1m" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-rose-500">
+                                </div>
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Amazon Prime (1M)</label>
+                                    <input type="text" id="price-amazon_1m" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-rose-500">
+                                </div>
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Amazon Prime (6M)</label>
+                                    <input type="text" id="price-amazon_6m" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-rose-500">
+                                </div>
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Spotify Premium (1M)</label>
+                                    <input type="text" id="price-spotify_1m" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-rose-500">
+                                </div>
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Netflix 4K (1M)</label>
+                                    <input type="text" id="price-netflix_1m" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-rose-500">
+                                </div>
+                                <div class="bg-slate-950/70 p-3 sm:p-3.5 rounded-xl border border-slate-800">
+                                    <label class="block text-xs font-bold text-slate-300 mb-1">Crunchyroll (1M)</label>
+                                    <input type="text" id="price-crunchyroll_1m" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white text-base sm:text-sm focus:outline-none focus:border-orange-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Extra Bottom Save Button for Mobile Convenient Tap -->
+                        <div class="pt-4 border-t border-slate-800 flex justify-end">
+                            <button onclick="savePricing()" class="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-3 px-8 rounded-xl transition flex items-center justify-center gap-2 text-sm shadow-lg active:scale-95">
+                                <i class="fa-solid fa-floppy-disk"></i> Save All Prices
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- 3D Background Engine -->
+    <script src="bg-3d.js"></script>
+
+    <!-- Admin Panel JavaScript -->
+    <script>
+        let allTickets = [];
+        let currentTicketId = null;
+
+        // Modern Toast Notification Helper
+        function showAdminToast(msg, type = 'success') {
+            const existing = document.getElementById('admin-toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.id = 'admin-toast';
+            const isSuccess = type === 'success';
+            toast.className = `fixed top-4 left-1/2 -translate-x-1/2 z-[100] px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs sm:text-sm font-bold transition-all duration-300 transform -translate-y-6 opacity-0 ${
+                isSuccess ? 'bg-emerald-500 text-slate-950 shadow-emerald-500/20' : 'bg-red-500 text-white shadow-red-500/20'
+            }`;
+            toast.innerHTML = `<i class="fa-solid ${isSuccess ? 'fa-circle-check text-sm sm:text-base' : 'fa-circle-exclamation text-sm sm:text-base'}"></i><span>${escapeHtml(msg)}</span>`;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('-translate-y-6', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('-translate-y-6', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        async function fetchTickets() {
+            try {
+                const res = await fetch('/api/tickets');
+                allTickets = await res.json();
+                renderTicketList();
+                renderHistory();
+                if (currentTicketId) {
+                    const activeTicket = allTickets.find(t => t.id === currentTicketId);
+                    if (activeTicket) renderMessages(activeTicket.messages || []);
+                }
+            } catch (e) {
+                console.error("Error fetching tickets:", e);
+            }
+        }
+
+        async function fetchTicketsSilent() {
+            try {
+                const res = await fetch('/api/tickets');
+                allTickets = await res.json();
+                updateBadgesOnly();
+                if (currentTicketId) {
+                    const activeTicket = allTickets.find(t => t.id === currentTicketId);
+                    if (activeTicket) renderMessages(activeTicket.messages || [], false);
+                }
+            } catch (e) {}
+        }
+
+        function updateBadgesOnly() {
+            const openTickets = allTickets.filter(t => t.status === 'PENDING');
+            const count = openTickets.length;
+
+            const countEl = document.getElementById('open-ticket-count');
+            if (countEl) countEl.innerText = count;
+
+            const sidebarBadge = document.getElementById('sidebar-ticket-badge');
+            if (sidebarBadge) {
+                if (count > 0) {
+                    sidebarBadge.innerText = count;
+                    sidebarBadge.classList.remove('hidden');
+                } else {
+                    sidebarBadge.classList.add('hidden');
+                }
+            }
+
+            const mobBadge = document.getElementById('mob-ticket-badge');
+            if (mobBadge) {
+                if (count > 0) {
+                    mobBadge.innerText = count;
+                    mobBadge.classList.remove('hidden');
+                } else {
+                    mobBadge.classList.add('hidden');
+                }
+            }
+        }
+
+        function renderTicketList() {
+            const container = document.getElementById('admin-ticket-list');
+            if (!container) return;
+
+            const openTickets = allTickets.filter(t => t.status === 'PENDING');
+            updateBadgesOnly();
+
+            if (openTickets.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 px-4">
+                        <i class="fa-solid fa-check-double text-3xl text-emerald-500/40 mb-3 block"></i>
+                        <p class="text-slate-400 font-bold text-sm">All Caught Up!</p>
+                        <p class="text-slate-500 text-xs mt-0.5">No pending customer tickets right now.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            openTickets.forEach(t => {
+                const isActive = t.id === currentTicketId;
+                const card = document.createElement('button');
+                card.onclick = () => selectAdminTicket(t.id);
+                card.className = `w-full text-left p-3 sm:p-3.5 rounded-xl border transition flex flex-col gap-1.5 active:scale-[0.98] ${
+                    isActive ? 'ticket-active' : 'bg-slate-800/80 hover:bg-slate-800 border-slate-700/60'
+                }`;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center w-full gap-2">
+                        <span class="font-bold text-white text-xs sm:text-sm truncate flex items-center gap-1.5 min-w-0">
+                            <i class="fa-solid fa-user-circle text-slate-400 shrink-0"></i>
+                            <span class="truncate">${escapeHtml(t.user.split('@')[0])}</span>
+                        </span>
+                        <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 shrink-0">PENDING</span>
+                    </div>
+                    <span class="text-xs text-slate-300 truncate w-full">${escapeHtml(t.items || 'General Order')}</span>
+                    <div class="flex justify-between items-center text-[10px] text-slate-500 mt-0.5">
+                        <span>#${t.id} • ${escapeHtml(t.created_at || 'Recent')}</span>
+                        <span class="text-emerald-400 font-bold text-xs">${escapeHtml(t.total_price || '')}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history-container');
+            if (!container) return;
+
+            const pastTickets = allTickets.filter(t => t.status !== 'PENDING');
+            if (pastTickets.length === 0) {
+                container.innerHTML = '<p class="text-slate-500 text-sm">No completed or cancelled orders yet.</p>';
+                return;
+            }
+
+            container.innerHTML = '';
+            pastTickets.forEach(t => {
+                const statusBadge = t.status === 'COMPLETED' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : 'text-red-400 bg-red-500/10 border-red-500/30';
+                container.innerHTML += `
+                    <div class="p-3.5 sm:p-4 rounded-xl bg-slate-950/60 border border-slate-800 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                <span class="font-bold text-white text-xs sm:text-sm truncate">Order #${t.id} - ${escapeHtml(t.user)}</span>
+                                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full border ${statusBadge}">${t.status}</span>
+                            </div>
+                            <p class="text-xs text-slate-400 truncate">${escapeHtml(t.items)} • <span class="text-emerald-400 font-bold">${escapeHtml(t.total_price || '')}</span></p>
+                            <p class="text-[10px] text-slate-500 mt-0.5">${escapeHtml(t.created_at || '')}</p>
+                        </div>
+                        <button onclick="switchTab('tickets'); selectAdminTicket(${t.id});" class="text-xs bg-slate-800 hover:bg-slate-700 px-3.5 py-2 rounded-lg text-slate-300 font-bold transition flex items-center justify-center gap-1.5 active:scale-95 self-end sm:self-center shrink-0">
+                            <i class="fa-solid fa-comments"></i> View Chat
+                        </button>
+                    </div>`;
+            });
+        }
+
+        function selectAdminTicket(id) {
+            currentTicketId = id;
+            const ticket = allTickets.find(t => t.id === id);
+            if (!ticket) return;
+
+            renderTicketList();
+
+            // Mobile view transition
+            if (window.innerWidth < 768) {
+                document.getElementById('admin-ticket-list-pane')?.classList.add('hidden');
+                const chatPane = document.getElementById('admin-chat-pane');
+                if (chatPane) {
+                    chatPane.classList.remove('hidden');
+                    chatPane.classList.add('flex');
+                }
+                const mobNav = document.getElementById('mobile-bottom-nav');
+                if (mobNav) mobNav.classList.add('hidden');
+            }
+
+            document.getElementById('admin-empty-state')?.classList.add('hidden');
+            document.getElementById('admin-active-content')?.classList.remove('hidden');
+
+            document.getElementById('chat-header-user').innerText = ticket.user;
+            document.getElementById('chat-header-details').innerText = `Order #${ticket.id}: ${ticket.items} (${ticket.total_price || ''}) • ${ticket.created_at || 'Recent'}`;
+            document.getElementById('chat-reqs-text').innerText = ticket.requirements || 'No custom notes provided.';
+
+            const statusEl = document.getElementById('chat-header-status');
+            statusEl.innerText = ticket.status;
+            statusEl.className = `px-2 py-0.5 text-[9px] sm:text-[10px] font-bold rounded-md uppercase tracking-wider shrink-0 ${
+                ticket.status === 'COMPLETED' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                ticket.status === 'CANCELLED' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+            }`;
+
+            renderMessages(ticket.messages || [], true);
+            setTimeout(() => {
+                const input = document.getElementById('admin-chat-input');
+                if (input && window.innerWidth >= 768) input.focus();
+            }, 100);
+        }
+
+        function closeAdminChatMobile() {
+            const chatPane = document.getElementById('admin-chat-pane');
+            if (chatPane) {
+                chatPane.classList.add('hidden');
+                chatPane.classList.remove('flex');
+            }
+            document.getElementById('admin-ticket-list-pane')?.classList.remove('hidden');
+            
+            const mobNav = document.getElementById('mobile-bottom-nav');
+            if (mobNav) mobNav.classList.remove('hidden');
+
+            currentTicketId = null;
+            renderTicketList();
+        }
+
+        function renderMessages(msgs, autoScroll = true) {
+            const container = document.getElementById('chat-messages');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (!msgs || msgs.length === 0) {
+                container.innerHTML = '<div class="text-center py-10 text-slate-500 text-xs">No messages yet. Send a message to start conversing with the customer.</div>';
+                return;
+            }
+
+            msgs.forEach(msg => {
+                const isStaff = msg.sender === 'Staff';
+                const isSystem = msg.sender === 'System';
+
+                if (isSystem) {
+                    container.innerHTML += `
+                        <div class="flex justify-center my-2">
+                            <span class="text-[10px] sm:text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full shadow-sm text-center">
+                                <i class="fa-solid fa-robot mr-1.5"></i> ${escapeHtml(msg.text)}
+                            </span>
+                        </div>`;
+                } else if (isStaff) {
+                    container.innerHTML += `
+                        <div class="flex items-end gap-2 justify-end">
+                            <div class="flex flex-col items-end max-w-[85%] sm:max-w-[75%]">
+                                <span class="text-[10px] text-emerald-400 font-bold mb-1">Staff (You) • ${escapeHtml(msg.time || '')}</span>
+                                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl rounded-br-none text-xs sm:text-sm font-semibold shadow-md break-words">
+                                    ${escapeHtml(msg.text)}
+                                </div>
+                            </div>
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-xs shrink-0 shadow-md">
+                                <i class="fa-solid fa-headset text-[10px] sm:text-xs"></i>
+                            </div>
+                        </div>`;
+                } else {
+                    container.innerHTML += `
+                        <div class="flex items-end gap-2 justify-start">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-slate-700 text-white font-bold flex items-center justify-center text-xs shrink-0 shadow-md">
+                                <i class="fa-solid fa-user text-[10px] sm:text-xs"></i>
+                            </div>
+                            <div class="flex flex-col items-start max-w-[85%] sm:max-w-[75%]">
+                                <span class="text-[10px] text-slate-400 font-bold mb-1">${escapeHtml(msg.sender || 'Customer')} • ${escapeHtml(msg.time || '')}</span>
+                                <div class="bg-slate-800 border border-slate-700/80 text-white px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl rounded-bl-none text-xs sm:text-sm font-medium shadow-md break-words">
+                                    ${escapeHtml(msg.text)}
+                                </div>
+                            </div>
+                        </div>`;
+                }
+            });
+
+            if (autoScroll) {
+                container.scrollTop = container.scrollHeight;
+            }
+        }
+
+        async function handleStaffSend(e) {
+            e.preventDefault();
+            const input = document.getElementById('admin-chat-input');
+            const text = input.value.trim();
+            if (!text || !currentTicketId) return;
+
+            input.value = '';
+
+            const ticket = allTickets.find(t => t.id === currentTicketId);
+            const dateStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            if (ticket) {
+                ticket.messages = ticket.messages || [];
+                ticket.messages.push({ sender: 'Staff', text: text, time: dateStr });
+                renderMessages(ticket.messages, true);
+            }
+
+            try {
+                await fetch('/api/tickets/' + currentTicketId + '/message', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sender: 'Staff', text: text })
+                });
+            } catch (err) {
+                console.error('Error sending staff message:', err);
+                showAdminToast('Failed to send message', 'error');
+            }
+        }
+
+        async function updateStatus(newStatus) {
+            if (!currentTicketId) return;
+            try {
+                const res = await fetch('/api/tickets/' + currentTicketId, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    const ticket = allTickets.find(t => t.id === currentTicketId);
+                    if (ticket) ticket.status = newStatus;
+                    selectAdminTicket(currentTicketId);
+                    renderTicketList();
+                    renderHistory();
+                    showAdminToast('Order status updated to ' + newStatus, 'success');
+                } else {
+                    showAdminToast('Error updating status', 'error');
+                }
+            } catch (err) {
+                console.error('Error updating status:', err);
+                showAdminToast('Connection error updating status', 'error');
+            }
+        }
+
+        function switchTab(tabId) {
+            if (window.innerWidth < 768) {
+                closeAdminChatMobile();
+            }
+
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-emerald-500/10', 'text-emerald-400');
+                el.classList.add('text-slate-400');
+            });
+
+            const activeTab = document.getElementById(tabId);
+            if (activeTab) activeTab.classList.add('active');
+
+            const btn = document.getElementById('btn-' + tabId);
+            if (btn) { btn.classList.add('bg-emerald-500/10', 'text-emerald-400'); btn.classList.remove('text-slate-400'); }
+
+            const btnMob = document.getElementById('btn-' + tabId + '-mob');
+            if (btnMob) { btnMob.classList.add('text-emerald-400'); btnMob.classList.remove('text-slate-400'); }
+
+            const titles = { 'tickets': 'Active Tickets', 'history': 'Order History', 'pricing': 'Edit Pricing' };
+            const pageTitle = document.getElementById('page-title');
+            if (pageTitle) {
+                pageTitle.innerHTML = `<i class="fa-solid fa-sliders text-emerald-400"></i> ${titles[tabId] || 'Admin'}`;
+            }
+        }
+
+        async function fetchPricing() {
+            try {
+                const res = await fetch('/api/pricing');
+                const data = await res.json();
+                for (const [key, val] of Object.entries(data)) {
+                    const input = document.getElementById('price-' + key);
+                    if (input) input.value = val;
+                }
+            } catch (err) {
+                console.error("Error loading pricing:", err);
+            }
+        }
+
+        async function savePricing() {
+            const saveButtons = document.querySelectorAll('#btn-save-pricing, #pricing button');
+            saveButtons.forEach(btn => {
+                if (btn.innerText.includes('Save')) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+                }
+            });
+
+            const keys = [
+                'mc_server', 'mc_config', 'discord_server', 'roblox_game', 'website', 'mc_resource',
+                'nitro_1', 'nitro_2', 'mcfa_1', 'mcfa_2',
+                'yt_1m', 'amazon_1m', 'amazon_6m', 'spotify_1m', 'netflix_1m', 'crunchyroll_1m'
+            ];
+
+            const payload = {};
+            keys.forEach(k => {
+                const input = document.getElementById('price-' + k);
+                if (input) payload[k] = input.value.trim();
+            });
+
+            try {
+                const res = await fetch('/api/pricing', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showAdminToast('All 16 service & store prices saved successfully!', 'success');
+                } else {
+                    showAdminToast('Error saving prices', 'error');
+                }
+            } catch (err) {
+                showAdminToast('Connection error while saving prices', 'error');
+            } finally {
+                saveButtons.forEach(btn => {
+                    if (btn.innerText.includes('Saving') || btn.disabled) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save All Prices';
+                    }
+                });
+            }
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // Handle responsive resize / orientation switch
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                document.getElementById('admin-ticket-list-pane')?.classList.remove('hidden');
+                const chatPane = document.getElementById('admin-chat-pane');
+                if (chatPane) {
+                    chatPane.classList.remove('hidden');
+                    chatPane.classList.add('flex');
+                }
+                const mobNav = document.getElementById('mobile-bottom-nav');
+                if (mobNav) mobNav.classList.add('hidden');
+            } else {
+                if (!currentTicketId) {
+                    document.getElementById('admin-ticket-list-pane')?.classList.remove('hidden');
+                    const chatPane = document.getElementById('admin-chat-pane');
+                    if (chatPane) {
+                        chatPane.classList.add('hidden');
+                        chatPane.classList.remove('flex');
+                    }
+                    const mobNav = document.getElementById('mobile-bottom-nav');
+                    if (mobNav) mobNav.classList.remove('hidden');
+                } else {
+                    const mobNav = document.getElementById('mobile-bottom-nav');
+                    if (mobNav) mobNav.classList.add('hidden');
+                }
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchTickets();
+            fetchPricing();
+            setInterval(fetchTicketsSilent, 3000);
+        });
+    </script>
+</body>
+</html>
