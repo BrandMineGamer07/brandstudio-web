@@ -77,7 +77,12 @@ def add_header(response):
     return response
 
 @app.route('/')
+@app.route('/api/index')
+@app.route('/index')
+@app.route('/index.html')
 def home():
+    if os.path.exists(os.path.join(BASE_DIR, 'index.html')):
+        return app.send_static_file('index.html')
     return app.send_static_file('index (4).html')
 
 @app.route('/favicon.ico')
@@ -86,6 +91,8 @@ def favicon():
 
 @app.route('/<path:path>')
 def serve_file(path):
+    if path in ['api/index', 'index', 'index.html', '']:
+        return home()
     return app.send_static_file(path)
 
 # --- AUTH API ---
